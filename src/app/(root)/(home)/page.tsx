@@ -1,4 +1,5 @@
 import CurrentTimeAndDate from "@/components/CurrentTimeAndDate";
+import MeetingTypeList from "@/components/MeetingTypeList";
 
 const Home = () => {
   return (
@@ -14,6 +15,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+      <MeetingTypeList />
     </section>
   );
 };
