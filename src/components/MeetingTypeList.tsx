@@ -7,6 +7,7 @@ import { useState } from "react";
 import HomeCard from "./HomeCard";
 import Loader from "./Loader";
 import MeetingModal from "./MeetingModal";
+import { useToast } from "./ui/use-toast";
 
 const MeetingTypeList = () => {
   const router = useRouter();
@@ -17,12 +18,13 @@ const MeetingTypeList = () => {
 
   const { user } = useUser();
   const client = useStreamVideoClient();
+  const { toast } = useToast();
 
   const createInstantMeeting = async () => {
     try {
       setLoading(true);
 
-      if (!user || !client) return;
+      if (!user || !client) throw new Error("Failed to create call");
 
       const callType = "default";
       const callId = crypto.randomUUID();
@@ -42,6 +44,10 @@ const MeetingTypeList = () => {
       router.push(`/meeting/${callId}`);
     } catch (e) {
       console.log(e);
+      toast({
+        title: "Uh oh! Something went wrong.",
+        description: "Failed to create meeting",
+      });
     } finally {
       setLoading(false);
     }

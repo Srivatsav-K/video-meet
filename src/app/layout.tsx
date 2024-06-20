@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster";
 import ClerkAuthProvider from "@/providers/ClerkAuthProvider";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
@@ -18,7 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <ClerkAuthProvider>
-        <body className={`${inter.className} bg-dark-2 `}>{children}</body>
+        <body className={`${inter.className} bg-dark-2 `}>
+          {children}
+          <Toaster />
+        </body>
       </ClerkAuthProvider>
     </html>
   );
