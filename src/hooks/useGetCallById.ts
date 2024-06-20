@@ -3,26 +3,29 @@ import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
 
 export const useGetCallById = (id: string | string[]) => {
   const [call, setCall] = useState<Call>();
-  const [isCallLoading, setIsCallLoading] = useState(false);
+  const [isCallLoading, setIsCallLoading] = useState(true);
   const [callError, setCallError] = useState("");
 
   const client = useStreamVideoClient();
 
   useEffect(() => {
-    if (!client) return;
-
     const loadCall = async () => {
       try {
-        setIsCallLoading(true);
+        if (!client) {
+          setCallError("Client not initialized");
+          return;
+        }
 
         // https://getstream.io/video/docs/react/guides/querying-calls/#filters
         const { calls } = await client.queryCalls({
           filter_conditions: { id },
         });
 
-        if (calls.length > 0) setCall(calls[0]);
+        if (calls.length > 0) {
+          setCall(calls[0]);
+        }
       } catch (error) {
-        console.error(error);
+        console.log("🚀 ~ loadCall ~ error:", error);
         setCallError("Error querying calls");
       } finally {
         setIsCallLoading(false);

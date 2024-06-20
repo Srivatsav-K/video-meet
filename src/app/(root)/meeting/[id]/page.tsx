@@ -21,6 +21,10 @@ const Meeting = ({ params: { id } }: MeetingProps) => {
   const [isSetupComplete, setIsSetupComplete] = useState(false);
   const { call, isCallLoading, callError } = useGetCallById(id || "");
 
+  const updateSetupCompletionStatus = (status: boolean) => {
+    setIsSetupComplete(status);
+  };
+
   if (!isLoaded || isCallLoading) return <Loader />;
   if (callError) {
     return (
@@ -35,7 +39,13 @@ const Meeting = ({ params: { id } }: MeetingProps) => {
     <main className="h-screen w-full">
       <StreamCall call={call}>
         <StreamTheme>
-          {isSetupComplete ? <MeeetingRoom /> : <MeetingSetup />}
+          {isSetupComplete ? (
+            <MeeetingRoom />
+          ) : (
+            <MeetingSetup
+              updateSetupCompletionStatus={updateSetupCompletionStatus}
+            />
+          )}
         </StreamTheme>
       </StreamCall>
     </main>
