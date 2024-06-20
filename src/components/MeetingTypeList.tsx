@@ -1,8 +1,11 @@
 "use client";
 
+import { useUser } from "@clerk/nextjs";
+import { useStreamVideoClient } from "@stream-io/video-react-sdk";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import HomeCard from "./HomeCard";
+import Loader from "./Loader";
 import MeetingModal from "./MeetingModal";
 
 const MeetingTypeList = () => {
@@ -10,11 +13,43 @@ const MeetingTypeList = () => {
   const [meetingState, setMeetingState] = useState<
     "isScheduleMeeting" | "isJoiningMeeting" | "isInstantMeeting" | undefined
   >();
+  const [loading, setLoading] = useState(false);
 
-  const createMeeting = () => {
-    alert("Hello");
+  const { user } = useUser();
+  const client = useStreamVideoClient();
+
+  const createInstantMeeting = async () => {
+    try {
+      setLoading(true);
+
+      if (!user || !client) return;
+
+      const callType = "default";
+      const callId = crypto.randomUUID();
+      const call = client.call(callType, callId);
+
+      if (!call) throw new Error("Failed to create call");
+
+      await call.getOrCreate({
+        data: {
+          starts_at: new Date().toISOString(),
+          custom: {
+            description: "Instant meeting",
+          },
+        },
+      });
+
+      router.push(`/meeting/${callId}`);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  if (loading) {
+    return <Loader />;
+  }
   return (
     <section className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
       <HomeCard
@@ -62,7 +97,7 @@ const MeetingTypeList = () => {
         onClose={() => setMeetingState(undefined)}
         title="Start an instant meeting"
         buttonText="Start meeting"
-        handleClick={createMeeting}
+        handleClick={createInstantMeeting}
         className="text-center"
       />
     </section>
